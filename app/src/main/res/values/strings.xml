@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">BoomCast</string>
+
+    <string name="info_podcast_subscribed">Podcast subscribed</string>
+    <string name="warn_podcast_subscribed">Podcast already subscribed</string>
+    <string name="share_episode_template" formatted="false">An amazing Podcast episode: %s - %s [%s]</string>
+    <string name="share_episode_title">Share a podcast to ..</string>
+    <string name="progress_buffering">Buffering...</string>
+    <string name="info_episodes_refreshed">Episodes refreshed</string>
+    <string name="user_name">Richard</string>
+    <string name="help_page_title">Help</string>
+</resources>

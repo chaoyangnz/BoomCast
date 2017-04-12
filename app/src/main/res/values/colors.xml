@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1d1d1d</color>
+    <color name="colorPrimaryDark">#0b0b0b</color>
+    <color name="colorPurple">#55a76dba</color>
+    <color name="colorAccent">#7CC6C4</color>
+
+    <color name="playerDark">#313131</color>
+    <color name="playerLightDark">#75505050</color>
+    <color name="playerGrey">#b0a3a3a3</color>
+    <color name="playerWhite">#EEEEEE</color>
+    <color name="episodeOdd">#B9393939</color>
+</resources>

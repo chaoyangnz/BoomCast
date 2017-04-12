@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/normal_margin"
+    tools:context="me.yangchao.boomcast.ui.PodcastNewFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Feed Address (iTunes)"
+        android:padding="@dimen/micro_margin"/>
+
+    <EditText
+        android:id="@+id/podcast_feed_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="http://www.bbc.co.uk/programmes/p02pc9tn/episodes/downloads.rss"/>
+
+    <Button
+        android:id="@+id/subscribe_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Subscribe"
+        />
+
+</LinearLayout>
