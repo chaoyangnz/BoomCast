@@ -5,7 +5,7 @@ It is mainly to demonstrate the basics of SQLite, networking, sharing and much m
 
 ---
 
-This app is used to manage subscriptions of Podcast.
+This App is used to manage subscriptions of Podcast.
 
 ### Features
 
@@ -41,4 +41,13 @@ This app is used to manage subscriptions of Podcast.
 ### TODO
 
 - Support episode downloading and offline playback
+- Background playing cross multiple Activities
 - Automatic refresh strategy
+
+### Screen snapshot
+
+<img src="snapshot1.jpeg" width="180" />
+<img src="snapshot2.jpeg" width="180" />
+<img src="snapshot3.jpeg" width="180" />
+<img src="snapshot4.jpeg" width="180" />
+<img src="snapshot5.jpeg" width="180" />

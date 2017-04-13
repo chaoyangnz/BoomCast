@@ -18,6 +18,9 @@ public class MainActivity extends BaseActivity {
 
     private final static int REQUEST_NEW_PODCAST = 1;
 
+    // managed Fragements
+    PodcastsFragment podcastsFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +29,7 @@ public class MainActivity extends BaseActivity {
         addToolbar(true);
         addNavigation();
 
-        PodcastsFragment podcastsFragment = addFragment(PodcastsFragment::new, R.id.podcasts_fragment);
+        podcastsFragment = addFragment(PodcastsFragment::new, R.id.podcasts_fragment);
         podcastsFragment.podcastClicked.subscribe(podcastId -> {
             PodcastActivity.startActivity(this, podcastId);
         });
@@ -47,6 +50,8 @@ public class MainActivity extends BaseActivity {
             if(resultCode == RESULT_OK) {
                 Snackbar.make(findViewById(R.id.podcasts_fragment), R.string.info_podcast_subscribed, Snackbar.LENGTH_LONG)
                         .show();
+
+                podcastsFragment.refresh();
             }
         }
     }

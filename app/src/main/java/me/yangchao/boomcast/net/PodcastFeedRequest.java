@@ -85,9 +85,9 @@ public class PodcastFeedRequest extends Request<Podcast> {
 
             for(SyndEntry entry : feed.getEntries()) {
                 Episode episode = Episode.fromSyndEntry(entry);
-                episode.setPodcast(podcast);
+                episode.setPodcastId(podcast.getId());
 
-                List<Episode> existingEpisodes = Episode.find(Episode.class, "podcast = ? and link = ?", String.valueOf(podcast.getId()), entry.getLink());
+                List<Episode> existingEpisodes = Episode.find(Episode.class, "podcast_id = ? and link = ?", String.valueOf(podcast.getId()), entry.getLink());
                 if(!existingEpisodes.isEmpty()) {
                     episode.setId(existingEpisodes.get(0).getId());
                 }

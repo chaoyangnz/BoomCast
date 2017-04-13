@@ -27,7 +27,7 @@ public class Podcast extends SugarRecord {
     private Date refreshedDate;
 
     public List<Episode> getEpisodes() {
-        return Episode.find(Episode.class, "podcast = ? order by published_date desc", String.valueOf(getId()));
+        return Episode.find(Episode.class, "podcast_id = ? order by published_date desc", String.valueOf(getId()));
     }
 
     public String getFeedUrl() {

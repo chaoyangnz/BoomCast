@@ -11,7 +11,7 @@ import java.util.Date;
  */
 
 public class Episode extends SugarRecord {
-    private Podcast podcast;
+    private Long podcastId;
 
     private String title;
     private String description;
@@ -23,11 +23,15 @@ public class Episode extends SugarRecord {
     private String itunesAuthor;
 
     public Podcast getPodcast() {
-        return podcast;
+        return Podcast.findById(Podcast.class, podcastId);
     }
 
-    public void setPodcast(Podcast podcast) {
-        this.podcast = podcast;
+    public Long getPodcastId() {
+        return podcastId;
+    }
+
+    public void setPodcastId(Long podcastId) {
+        this.podcastId = podcastId;
     }
 
     public String getTitle() {

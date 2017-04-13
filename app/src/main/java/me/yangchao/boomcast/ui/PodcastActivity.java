@@ -18,6 +18,9 @@ public class PodcastActivity extends BaseActivity {
 
     private Long podcastId;
 
+    // managed Fragments
+    PodcastFragment podcastFragment;
+
     public static void startActivity(Context context, Long podcastId) {
         Intent intent = new Intent(context, PodcastActivity.class);
         intent.putExtra(PodcastActivity.INTENT_PODCAST_ID, podcastId);
@@ -34,7 +37,7 @@ public class PodcastActivity extends BaseActivity {
         Intent intent = getIntent();
         podcastId = intent.getLongExtra(INTENT_PODCAST_ID, 1);
 
-        PodcastFragment podcastFragment = addFragment(() -> PodcastFragment.newInstance(podcastId), R.id.podcast_fragment);
+        podcastFragment = addFragment(() -> PodcastFragment.newInstance(podcastId), R.id.podcast_fragment);
         podcastFragment.episodeClicked.subscribe(episodeId -> {
            EpisodeActivity.startActivity(this, episodeId);
         });
@@ -61,6 +64,7 @@ public class PodcastActivity extends BaseActivity {
                             Snackbar.make(findViewById(R.id.podcast_fragment), R.string.info_episodes_refreshed,
                                     Snackbar.LENGTH_SHORT)
                                     .show();
+                            podcastFragment.refresh();
                         }, error -> {});
                 return true;
             default:

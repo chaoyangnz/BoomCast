@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/normal_margin"
-    tools:context="me.yangchao.boomcast.ui.PodcastNewFragment">
+    tools:context="me.yangchao.boomcast.ui.PodcastNewFragment"
+    android:weightSum="1">
 
     <TextView
         android:layout_width="match_parent"
@@ -16,7 +17,7 @@
         android:id="@+id/podcast_feed_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="http://www.bbc.co.uk/programmes/p02pc9tn/episodes/downloads.rss"/>
+        android:hint="http://example.com/rss"/>
 
     <Button
         android:id="@+id/subscribe_button"
@@ -24,5 +25,78 @@
         android:layout_height="wrap_content"
         android:text="Subscribe"
         />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.08"
+        android:padding="@dimen/micro_margin"
+        android:text="Recommendations"
+        android:gravity="center_vertical"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+
+        <ImageView
+            android:id="@+id/podcast_sixminutesenglish"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/p02h1m0y"
+            android:tag="http://www.bbc.co.uk/programmes/p02pc9tn/episodes/downloads.rss"/>
+
+        <View
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/podcast_outlook"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/p04f4qyd"
+            android:tag="http://www.bbc.co.uk/programmes/p02s5rx7/episodes/downloads.rss"/>
+
+        <View
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/podcast_ondemand"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/p04yhqm1"
+            android:scaleType="fitXY"
+            android:tag="http://www.bbc.co.uk/programmes/p04yhqm1/episodes/downloads.rss"/>
+
+        <View
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/podcast_sixminutesgrammar"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/p02pc2yh"
+            android:scaleType="fitXY"
+            android:tag="http://www.bbc.co.uk/programmes/p02pc9wq/episodes/downloads.rss"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+
+
+    </LinearLayout>
 
 </LinearLayout>

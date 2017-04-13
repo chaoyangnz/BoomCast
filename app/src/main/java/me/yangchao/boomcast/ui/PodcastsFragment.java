@@ -63,10 +63,10 @@ public class PodcastsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        refresh();
+//        refresh();
     }
 
-    private void refresh() {
+    public void refresh() {
         podcasts = Podcast.listAll(Podcast.class);
 
         if(podcastsRecyclerView != null) {

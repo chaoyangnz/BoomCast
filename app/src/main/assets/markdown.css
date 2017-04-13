@@ -23,7 +23,7 @@ html, body {
 }
 
 body {
-	font: .9em Palatino, Times,"Vollkorn";
+	font: .7em Palatino, Times,"Vollkorn";
 	color: #ccc;
 	line-height: 1.4;
 	text-align: justify;
@@ -118,7 +118,7 @@ hr {
 	border-right: 0;
 	}
 p#heart{
-	font-size: 2em;
+	font-size: 1.3em;
 	line-height: 1;
 	text-align: center;
 	color: #ccc;
@@ -139,7 +139,7 @@ body#index li {
 -------------------------------------------------------- */
 @media only screen and (max-device-width: 1024px) {
 body {
-	font-size: 120%;
+	font-size: 110%;
 	line-height: 1.4;
 	}
 } /* @iPad */

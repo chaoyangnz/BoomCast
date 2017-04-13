@@ -17,7 +17,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
 
 import java.io.IOException;
 
@@ -26,6 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
+import me.yangchao.boomcast.model.Podcast;
 import me.yangchao.boomcast.util.BlurTransformation;
 
 /**
@@ -39,7 +39,7 @@ public class EpisodeFragment extends Fragment {
     }
 
     private static final String ARG_EPISODE_ID = "episodeId";
-    private static final int BLUR_RADIS = 125;
+    private static final int BLUR_RADIUS = 125;
     private static final int BLUR_FILTER = 0x8C2E2E2E;
 
     // UI widget
@@ -56,6 +56,7 @@ public class EpisodeFragment extends Fragment {
     private Handler handler = new Handler();
 
     // data
+    private Podcast podcast;
     private Episode episode;
 
     /**
@@ -84,6 +85,7 @@ public class EpisodeFragment extends Fragment {
         Long episodeId = args.getLong(ARG_EPISODE_ID);
 
         episode = Episode.findById(Episode.class, episodeId);
+        podcast = episode.getPodcast();
 
         getActivity().setTitle(episode.getTitle());
     }
@@ -95,18 +97,17 @@ public class EpisodeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_episode, container, false);
         ButterKnife.bind(this, view);
 
-        podcastTitle.setText(episode.getPodcast().getTitle());
+        podcastTitle.setText(podcast.getTitle());
         episodeTitle.setText(episode.getTitle());
         episodeDescription.setText(episode.getDescription());
 
         Glide.with(getContext())
-                .load(Uri.parse(episode.getPodcast().getImageUrl()))
-                .transform(new BlurTransformation(getContext(), BLUR_RADIS, BLUR_FILTER))
+                .load(Uri.parse(podcast.getImageUrl()))
+                .transform(new BlurTransformation(getContext(), BLUR_RADIUS, BLUR_FILTER))
                 .into(podcastImageBackground);
 
         Glide.with(getContext())
-                .load(Uri.parse(episode.getPodcast().getImageUrl()))
-                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                .load(Uri.parse(podcast.getImageUrl()))
                 .into(podcastImage);
 
         mediaPlayer = new MediaPlayer();
@@ -176,8 +177,8 @@ public class EpisodeFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
         if (mediaPlayer != null) {
             mediaPlayer.reset();
             mediaPlayer.release();

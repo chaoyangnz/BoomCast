@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.subjects.PublishSubject;
@@ -21,6 +24,7 @@ import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
 import me.yangchao.boomcast.model.Podcast;
 import me.yangchao.boomcast.util.DateUtil;
+import me.yangchao.boomcast.util.StringUtil;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,6 +43,7 @@ public class PodcastFragment extends Fragment {
 
     // data
     private Podcast podcast;
+    private List<Episode> episodes = new ArrayList<>();
 
     // UI widgets
     @BindView(R.id.podcast_image) ImageView podcastImage;
@@ -85,8 +90,16 @@ public class PodcastFragment extends Fragment {
 
         episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter());
         episodesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        refresh();
 
         return view;
+    }
+
+    public void refresh() {
+        episodes = podcast.getEpisodes();
+        if(episodesRecyclerView != null) {
+            episodesRecyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     class EpisodesRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
@@ -102,7 +115,7 @@ public class PodcastFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Episode episode = PodcastFragment.this.podcast.getEpisodes().get(position);
+            Episode episode = episodes.get(position);
 
             if(position % 2 == 1) {
                 holder.itemView.setBackgroundResource(R.color.episodeOdd);
@@ -110,7 +123,7 @@ public class PodcastFragment extends Fragment {
 
             // podcast title, cover, date
             holder.episodeTitle.setText(episode.getTitle());
-            holder.episodeDescription.setText(episode.getDescription().trim());
+            holder.episodeDescription.setText(StringUtil.trim(episode.getDescription().trim(), 100));
             holder.episodeDuration.setText(DateUtil.formatDuration(episode.getItunesDuration()));
             holder.episodePublishedDate.setText(DateUtil.formatDate(episode.getPublishedDate()));
 
@@ -122,7 +135,7 @@ public class PodcastFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return podcast.getEpisodes().size();
+            return episodes.size();
         }
     }
 

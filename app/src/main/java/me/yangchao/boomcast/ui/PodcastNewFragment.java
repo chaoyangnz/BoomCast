@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -47,9 +48,12 @@ public class PodcastNewFragment extends Fragment {
 
     // save subscription
     @OnClick(R.id.subscribe_button)
-    public void subscribe(View view) {
+    public void subscribe() {
         String feedUrl = podcastFeedUrl.getText().toString();
+        subscribe(feedUrl);
+    }
 
+    public void subscribe(String feedUrl) {
         // hide keyboard
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
@@ -68,4 +72,10 @@ public class PodcastNewFragment extends Fragment {
                     .show();
         }
     }
+
+    @OnClick({R.id.podcast_ondemand, R.id.podcast_sixminutesgrammar, R.id.podcast_outlook, R.id.podcast_sixminutesenglish})
+    public void subscribeRecommendations(ImageView view) {
+        subscribe((String)view.getTag());
+    }
+
 }
