@@ -1,7 +1,6 @@
 package me.yangchao.boomcast.ui;
 
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +14,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.subjects.PublishSubject;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
@@ -40,12 +41,15 @@ public class PodcastFragment extends Fragment {
     private Podcast podcast;
 
     // UI widgets
-    private ImageView podcastImage;
-    private TextView podcastDescription;
-    private RecyclerView episodesRecyclerView;
+    @BindView(R.id.podcast_image) ImageView podcastImage;
+    @BindView(R.id.podcast_description) TextView podcastDescription;
+    @BindView(R.id.episode_recyclerview) RecyclerView episodesRecyclerView;
 
     // event subject
     PublishSubject<Long> episodeClicked = PublishSubject.create();
+
+    // others
+    LayoutInflater inflater;
 
     public PodcastFragment() {
         // Required empty public constructor
@@ -68,9 +72,9 @@ public class PodcastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        this.inflater = inflater;
         View view = inflater.inflate(R.layout.fragment_podcast, container, false);
-        podcastImage = (ImageView) view.findViewById(R.id.podcast_image);
-        podcastDescription = (TextView) view.findViewById(R.id.podcast_description);
+        ButterKnife.bind(this, view);
 
         Glide.with(container.getContext())
                 .load(Uri.parse(podcast.getImageUrl()))
@@ -79,7 +83,6 @@ public class PodcastFragment extends Fragment {
 
         podcastDescription.setText(podcast.getDescription());
 
-        episodesRecyclerView = (RecyclerView) view.findViewById(R.id.episode_recyclerview);
         episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter());
         episodesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -87,15 +90,12 @@ public class PodcastFragment extends Fragment {
     }
 
     class EpisodesRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
-
-        private Context context;
-
         public EpisodesRecyclerAdapter() {};
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            if (context == null) context = parent.getContext();
-            View view = LayoutInflater.from(context).inflate(R.layout.recycler_episodes_item, parent, false);
+
+            View view = inflater.inflate(R.layout.recycler_episodes_item, parent, false);
 
             return new ViewHolder(view);
         }
@@ -105,7 +105,7 @@ public class PodcastFragment extends Fragment {
             Episode episode = PodcastFragment.this.podcast.getEpisodes().get(position);
 
             if(position % 2 == 1) {
-                holder.containterLayout.setBackgroundResource(R.color.episodeOdd);
+                holder.itemView.setBackgroundResource(R.color.episodeOdd);
             }
 
             // podcast title, cover, date
@@ -115,7 +115,7 @@ public class PodcastFragment extends Fragment {
             holder.episodePublishedDate.setText(DateUtil.formatDate(episode.getPublishedDate()));
 
             // click item event handler
-            holder.container.setOnClickListener(v -> {
+            holder.itemView.setOnClickListener(v -> {
                 episodeClicked.onNext(episode.getId());
             });
         }
@@ -127,23 +127,14 @@ public class PodcastFragment extends Fragment {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        View container;
-//        ImageView episodeImage;
-        View containterLayout;
-        TextView episodeTitle;
-        TextView episodeDescription;
-        TextView episodeDuration;
-        TextView episodePublishedDate;
+        @BindView(R.id.episode_title) TextView episodeTitle;
+        @BindView(R.id.episode_description) TextView episodeDescription;
+        @BindView(R.id.episode_duration) TextView episodeDuration;
+        @BindView(R.id.episode_publisheddate) TextView episodePublishedDate;
 
         public ViewHolder(View view) {
             super(view);
-            container = view;
-            containterLayout = view.findViewById(R.id.container_layout);
-//            episodeImage = (ImageView) view.findViewById(R.id.episode_image);
-            episodeTitle = (TextView) view.findViewById(R.id.episode_title);
-            episodeDescription = (TextView) view.findViewById(R.id.episode_description);
-            episodeDuration = (TextView) view.findViewById(R.id.episode_duration);
-            episodePublishedDate = (TextView) view.findViewById(R.id.episode_publisheddate);
+            ButterKnife.bind(this, view);
         }
     }
 

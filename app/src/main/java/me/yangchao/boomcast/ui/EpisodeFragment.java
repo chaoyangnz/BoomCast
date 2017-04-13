@@ -21,6 +21,9 @@ import com.bumptech.glide.signature.StringSignature;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
 import me.yangchao.boomcast.util.BlurTransformation;
@@ -40,8 +43,16 @@ public class EpisodeFragment extends Fragment {
     private static final int BLUR_FILTER = 0x8C2E2E2E;
 
     // UI widget
-    ImageView playPauseButton;
-    SeekBar seekBar;
+    @BindView(R.id.podcast_title) TextView podcastTitle;
+    @BindView(R.id.episode_title) TextView episodeTitle;
+    @BindView(R.id.episode_description) TextView episodeDescription;
+    @BindView(R.id.podcast_image_background) ImageView podcastImageBackground;
+    @BindView(R.id.podcast_image) ImageView podcastImage;
+    @BindView(R.id.play_pause_button) ImageView playPauseButton;
+    @BindView(R.id.rewind_button) ImageView rewindButton;
+    @BindView(R.id.forward_button) ImageView forwardButton;
+    @BindView(R.id.seekbar) SeekBar seekBar;
+
     private Handler handler = new Handler();
 
     // data
@@ -82,50 +93,24 @@ public class EpisodeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_episode, container, false);
+        ButterKnife.bind(this, view);
 
-        TextView podcastTitle = (TextView) view.findViewById(R.id.podcast_title);
         podcastTitle.setText(episode.getPodcast().getTitle());
-
-        TextView episodeTitle = (TextView) view.findViewById(R.id.episode_title);
         episodeTitle.setText(episode.getTitle());
-
-        TextView episodeDescription = (TextView) view.findViewById(R.id.episode_description);
         episodeDescription.setText(episode.getDescription());
 
-        ImageView podcastImageBackground = (ImageView) view.findViewById(R.id.podcast_image_background);
         Glide.with(getContext())
                 .load(Uri.parse(episode.getPodcast().getImageUrl()))
                 .transform(new BlurTransformation(getContext(), BLUR_RADIS, BLUR_FILTER))
                 .into(podcastImageBackground);
 
-        ImageView podcastImage = (ImageView) view.findViewById(R.id.podcast_image);
         Glide.with(getContext())
                 .load(Uri.parse(episode.getPodcast().getImageUrl()))
                 .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .into(podcastImage);
 
-        playPauseButton = (ImageView) view.findViewById(R.id.play_pause_button);
-
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        playPauseButton.setOnClickListener(v -> {
-            if (!playPause) {
-                playPauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                if (intialStage)
-                    new PlayerBufferTask().execute(episode.getEnclosureUrl());
-                else {
-                    if (!mediaPlayer.isPlaying()) {
-                        mediaPlayer.start();
-                    }
-                }
-                playPause = true;
-            } else {
-                playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                if (mediaPlayer.isPlaying())
-                    mediaPlayer.pause();
-                playPause = false;
-            }
-        });
 
         seekBar = (SeekBar) view.findViewById(R.id.seekbar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -156,6 +141,40 @@ public class EpisodeFragment extends Fragment {
         return view;
     }
 
+    @OnClick(R.id.play_pause_button)
+    public void playOrPause() {
+        if (!playPause) {
+            playPauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+            if (intialStage)
+                new PlayerBufferTask().execute(episode.getEnclosureUrl());
+            else {
+                if (!mediaPlayer.isPlaying()) {
+                    mediaPlayer.start();
+                }
+            }
+            playPause = true;
+        } else {
+            playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            if (mediaPlayer.isPlaying())
+                mediaPlayer.pause();
+            playPause = false;
+        }
+    }
+
+    @OnClick(R.id.rewind_button)
+    public void rewind() {
+        if(mediaPlayer != null && !intialStage){
+            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 5 * 1000);
+        }
+    }
+
+    @OnClick(R.id.forward_button)
+    public void forward() {
+        if(mediaPlayer != null && !intialStage){
+            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5 * 1000);
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -167,12 +186,16 @@ public class EpisodeFragment extends Fragment {
     }
 
     /**
-     * preparing mediaplayer will take sometime to buffer the content so prepare it inside the background thread and starting it on UI thread.
-     * @author piyush
-     *
+     * preparing mediaplayer will take sometime to buffer the content
+     * so prepare it inside the background thread and starting it on UI thread.
      */
     class PlayerBufferTask extends AsyncTask<String, Void, Boolean> {
         private ProgressDialog progress;
+
+        public PlayerBufferTask() {
+            progress = new ProgressDialog(getContext());
+            progress.setCanceledOnTouchOutside(false);
+        }
 
         @Override
         protected Boolean doInBackground(String... params) {
@@ -213,11 +236,6 @@ public class EpisodeFragment extends Fragment {
             intialStage = false;
         }
 
-        public PlayerBufferTask() {
-            progress = new ProgressDialog(getContext());
-            progress.setCanceledOnTouchOutside(false);
-        }
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -225,5 +243,4 @@ public class EpisodeFragment extends Fragment {
             this.progress.show();
         }
     }
-
 }

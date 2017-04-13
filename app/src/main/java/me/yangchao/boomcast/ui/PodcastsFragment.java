@@ -18,6 +18,8 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.subjects.PublishSubject;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Podcast;
@@ -32,7 +34,7 @@ public class PodcastsFragment extends Fragment {
     private List<Podcast> podcasts = new ArrayList<>();
 
     // ui widgets
-    private RecyclerView podcastsRecyclerView;
+    @BindView(R.id.podcasts_recyclerview) RecyclerView podcastsRecyclerView;
 
     // event subject
     PublishSubject<Long> podcastClicked = PublishSubject.create();
@@ -48,8 +50,9 @@ public class PodcastsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_podcasts, container, false);
 
+        ButterKnife.bind(this, view);
+
         // recycler view
-        podcastsRecyclerView = (RecyclerView) view.findViewById(R.id.podcasts_recyclerview);
         podcastsRecyclerView.setAdapter(new PodcastsRecyclerAdapter());
         podcastsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -99,9 +102,8 @@ public class PodcastsFragment extends Fragment {
                     .override(180, 240)
                     .into(holder.podcastImage);
 
-
             // click item event handler
-            holder.container.setOnClickListener(v -> {
+            holder.itemView.setOnClickListener(v -> {
                 podcastClicked.onNext(podcast.getId());
             });
         }
@@ -113,23 +115,13 @@ public class PodcastsFragment extends Fragment {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        View container;
-        ImageView podcastImage;
-        TextView podcastTitle;
-        TextView podcastPublishedAt;
+        @BindView(R.id.podcast_image) ImageView podcastImage;
+        @BindView(R.id.podcast_title) TextView podcastTitle;
+        @BindView(R.id.podcast_published_at) TextView podcastPublishedAt;
 
         public ViewHolder(View view) {
             super(view);
-            container = view;
-            podcastImage = (ImageView) view.findViewById(R.id.podcast_image);
-            podcastTitle = (TextView) view.findViewById(R.id.podcast_title);
-            podcastPublishedAt = (TextView) view.findViewById(R.id.podcast_published_at);
+            ButterKnife.bind(this, view);
         }
     }
-
 }
-
-
-
-
-

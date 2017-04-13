@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.subjects.PublishSubject;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Podcast;
@@ -22,11 +24,10 @@ import me.yangchao.boomcast.net.PodcastFeedRequest;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PodcastNewFragment extends Fragment implements View.OnClickListener {
+public class PodcastNewFragment extends Fragment {
 
-    // UI widget
-    private EditText podcastFeedUrl;
-    private Button subscribeButton;
+    // UI widgets
+    @BindView(R.id.podcast_feed_url) EditText podcastFeedUrl;
 
     // event subject
     public PublishSubject<Podcast> subscriptionSaved = PublishSubject.create();
@@ -40,18 +41,13 @@ public class PodcastNewFragment extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_podcast_new, container, false);
-
-        podcastFeedUrl = (EditText) view.findViewById(R.id.podcast_feed_url);
-        subscribeButton = (Button) view.findViewById(R.id.subscribe_button);
-
-        subscribeButton.setOnClickListener(this);
-
+        ButterKnife.bind(this, view);
         return view;
     }
 
     // save subscription
-    @Override
-    public void onClick(View view) {
+    @OnClick(R.id.subscribe_button)
+    public void subscribe(View view) {
         String feedUrl = podcastFeedUrl.getText().toString();
 
         // hide keyboard
