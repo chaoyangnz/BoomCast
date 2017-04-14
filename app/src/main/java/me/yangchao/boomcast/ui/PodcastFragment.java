@@ -111,7 +111,7 @@ public class PodcastFragment extends Fragment {
     }
 
     class EpisodesRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
-        public EpisodesRecyclerAdapter() {};
+        public EpisodesRecyclerAdapter() {}
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

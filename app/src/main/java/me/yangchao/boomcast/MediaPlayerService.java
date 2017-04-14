@@ -81,7 +81,7 @@ public class MediaPlayerService {
 
     private void updateListenDuration() {
         if(startTime < 0) return;
-        if(episode == null) return;;
+        if(episode == null) return;
 
         Date now = new Date();
         String date = DateUtil.formatDate(now);

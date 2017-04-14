@@ -78,7 +78,7 @@ public class PodcastsFragment extends Fragment {
 
         private Context context;
 
-        public PodcastsRecyclerAdapter() {};
+        public PodcastsRecyclerAdapter() {}
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
