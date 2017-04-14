@@ -7,12 +7,18 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import me.yangchao.boomcast.App;
 import me.yangchao.boomcast.R;
+import me.yangchao.boomcast.model.Episode;
 
 public class MainActivity extends BaseActivity {
 
@@ -21,10 +27,14 @@ public class MainActivity extends BaseActivity {
     // managed Fragements
     PodcastsFragment podcastsFragment;
 
+    @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @BindView(R.id.nav) NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         addToolbar(true);
         addNavigation();
@@ -38,7 +48,6 @@ public class MainActivity extends BaseActivity {
         fab.setOnClickListener(v -> {
             PodcastNewActivity.startActivity(this, REQUEST_NEW_PODCAST);
         });
-
     }
 
     @Override
@@ -63,27 +72,42 @@ public class MainActivity extends BaseActivity {
                 DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
+            case R.id.action_player:
+                // refresh episode
+                Episode episode = App.getInstance().mediaPlayerService.episode;
+                if(episode != null) {
+                    EpisodeActivity.startActivity(this, episode.getId());
+                } else {
+                    // SnackBar to display successful message
+                    Snackbar.make(findViewById(R.id.podcasts_fragment), R.string.warn_no_episode_playing,
+                            Snackbar.LENGTH_SHORT)
+                            .show();
+                }
+
+                return true;
             default:
         }
         return true;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
     private void addNavigation() {
         // drawer: navigation view
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav);
         ImageView userAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.user_avatar);
         TextDrawable drawable = TextDrawable.builder().buildRound("RY", R.color.playerGrey);
         userAvatar.setImageDrawable(drawable);
         navigationView.setNavigationItemSelectedListener(item -> {
             drawerLayout.closeDrawers();
             switch (item.getItemId()) {
-//                case R.id.nav_settings:
-//                    break;
                 case R.id.nav_statistics:
-//                    Intent intent = new Intent(SearchActivity.ACTION_FAVORITE);
-//                    startActivity(intent);
+                    StatisticsActivity.startActivity(this);
                     break;
                 case R.id.nav_help:
                     HelpActivity.startActivity(this);
@@ -92,5 +116,11 @@ public class MainActivity extends BaseActivity {
             }
             return true;
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        drawerLayout.closeDrawers();
     }
 }

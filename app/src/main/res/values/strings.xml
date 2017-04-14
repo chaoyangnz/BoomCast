@@ -9,4 +9,6 @@
     <string name="info_episodes_refreshed">Episodes refreshed</string>
     <string name="user_name">Richard</string>
     <string name="help_page_title">Help</string>
+    <string name="warn_no_episode_playing">No episode playing</string>
+    <string name="search_hint">Search episodes ..</string>
 </resources>

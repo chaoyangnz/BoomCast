@@ -98,7 +98,7 @@ public class PodcastsFragment extends Fragment {
             // podcast cover
             Glide.with(context)
                     .load(Uri.parse(podcast.getImageUrl()))
-                    .placeholder(R.drawable.ic_photo_black_24dp)
+                    .placeholder(R.drawable.placeholder)
                     .override(180, 240)
                     .into(holder.podcastImage);
 

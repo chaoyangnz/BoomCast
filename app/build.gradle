@@ -40,6 +40,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    //    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
+
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
@@ -54,12 +56,9 @@ dependencies {
     compile 'com.rometools:rome-modules:1.7.1'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'us.feras.mdv:markdownview:1.1.0'
-
     compile 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     testCompile 'junit:junit:4.12'
-    //    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
-
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
 }

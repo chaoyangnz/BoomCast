@@ -19,6 +19,7 @@ public class App extends Application {
 
     private static App APP;
     private RequestQueue mRequestQueue;
+    public MediaPlayerService mediaPlayerService;
 
     @Override
     public void onCreate() {
@@ -31,6 +32,9 @@ public class App extends Application {
         // volley
         mRequestQueue = Volley.newRequestQueue(this, new OkHttp3Stack());
         mRequestQueue.start();
+
+        // media player
+        mediaPlayerService = new MediaPlayerService();
     }
 
     @Override
@@ -42,6 +46,10 @@ public class App extends Application {
 
         mRequestQueue.stop();
         mRequestQueue = null;
+
+        // destroy media player
+        mediaPlayerService.destroy();
+
     }
 
     public static App getInstance() { return APP; }
@@ -75,4 +83,5 @@ public class App extends Application {
                                          final String tag) {
         APP.getVolleyRequestQueue().cancelAll(tag);
     }
+
 }

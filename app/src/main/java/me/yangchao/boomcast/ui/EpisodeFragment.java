@@ -1,11 +1,7 @@
 package me.yangchao.boomcast.ui;
 
 
-import android.app.ProgressDialog;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -18,11 +14,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.yangchao.boomcast.App;
+import me.yangchao.boomcast.MediaPlayerService;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
 import me.yangchao.boomcast.model.Podcast;
@@ -33,7 +29,6 @@ import me.yangchao.boomcast.util.BlurTransformation;
  */
 public class EpisodeFragment extends Fragment {
 
-
     public EpisodeFragment() {
         // Required empty public constructor
     }
@@ -41,6 +36,7 @@ public class EpisodeFragment extends Fragment {
     private static final String ARG_EPISODE_ID = "episodeId";
     private static final int BLUR_RADIUS = 125;
     private static final int BLUR_FILTER = 0x8C2E2E2E;
+    private static final int SEEKBAR_UPDATE_INTERVEL = 1000;
 
     // UI widget
     @BindView(R.id.podcast_title) TextView podcastTitle;
@@ -62,12 +58,9 @@ public class EpisodeFragment extends Fragment {
     /**
      * help to toggle between play and pause.
      */
-    private boolean playPause;
-    private MediaPlayer mediaPlayer;
-    /**
-     * remain false till media is not completed, inside OnCompletionListener make it true.
-     */
-    private boolean intialStage = true;
+    private boolean playing = false;
+
+    MediaPlayerService mediaPlayerService;
 
     public static EpisodeFragment newInstance(Long episodeId) {
         EpisodeFragment fragment = new EpisodeFragment();
@@ -88,6 +81,8 @@ public class EpisodeFragment extends Fragment {
         podcast = episode.getPodcast();
 
         getActivity().setTitle(episode.getTitle());
+
+        mediaPlayerService = App.getInstance().mediaPlayerService;
     }
 
     @Override
@@ -110,10 +105,8 @@ public class EpisodeFragment extends Fragment {
                 .load(Uri.parse(podcast.getImageUrl()))
                 .into(podcastImage);
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
         seekBar = (SeekBar) view.findViewById(R.id.seekbar);
+        // seekBar for user sliding
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
@@ -123,19 +116,50 @@ public class EpisodeFragment extends Fragment {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mediaPlayer != null && fromUser){
-                    mediaPlayer.seekTo(progress * 1000);
+                if(fromUser){
+                    mediaPlayerService.seekTo(episode, progress * 1000);
                 }
             }
         });
+
+        // set seekbar when finish loading
+        mediaPlayerService.audioPrepared.subscribe(duration -> {
+            if(mediaPlayerService.checkOwned(episode)) {
+                seekBar.setMax(duration / 1000);
+            }
+        });
+
+        // set seekbar when finish playing
+        mediaPlayerService.audioCompleted.subscribe(r -> {
+            if(mediaPlayerService.checkOwned(episode)) {
+                playing = false;
+                playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                seekBar.setProgress(0);
+            }
+        });
+
+        // set initial state for seekbar and play/pause buttons
+        if(mediaPlayerService.checkOwned(episode)) {
+            seekBar.setMax(mediaPlayerService.getDuration() / 1000);
+            if(mediaPlayerService.isPlaying()) playing = true;
+            if(playing) {
+                playPauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+            } else {
+                playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            }
+        }
+
+        // keep seekBar sync with player
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(mediaPlayer != null){
-                    int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+
+                int mCurrentPosition = mediaPlayerService.getCurrentPosition(episode) / 1000;
+                if(mCurrentPosition >= 0) {
                     seekBar.setProgress(mCurrentPosition);
                 }
-                handler.postDelayed(this, 1000);
+
+                handler.postDelayed(this, SEEKBAR_UPDATE_INTERVEL);
             }
         });
 
@@ -144,104 +168,24 @@ public class EpisodeFragment extends Fragment {
 
     @OnClick(R.id.play_pause_button)
     public void playOrPause() {
-        if (!playPause) {
-            playPauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-            if (intialStage)
-                new PlayerBufferTask().execute(episode.getEnclosureUrl());
-            else {
-                if (!mediaPlayer.isPlaying()) {
-                    mediaPlayer.start();
-                }
-            }
-            playPause = true;
+        if(!playing) {
+            boolean result = mediaPlayerService.play(episode, getContext());
+            if(result) playPauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+            playing = true;
         } else {
-            playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-            if (mediaPlayer.isPlaying())
-                mediaPlayer.pause();
-            playPause = false;
+            boolean result = mediaPlayerService.pause(episode);
+            if(result) playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            playing = false;
         }
     }
 
     @OnClick(R.id.rewind_button)
     public void rewind() {
-        if(mediaPlayer != null && !intialStage){
-            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 5 * 1000);
-        }
+        mediaPlayerService.offset(episode, -5);
     }
 
     @OnClick(R.id.forward_button)
     public void forward() {
-        if(mediaPlayer != null && !intialStage){
-            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5 * 1000);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.reset();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
-    /**
-     * preparing mediaplayer will take sometime to buffer the content
-     * so prepare it inside the background thread and starting it on UI thread.
-     */
-    class PlayerBufferTask extends AsyncTask<String, Void, Boolean> {
-        private ProgressDialog progress;
-
-        public PlayerBufferTask() {
-            progress = new ProgressDialog(getContext());
-            progress.setCanceledOnTouchOutside(false);
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            Boolean prepared;
-            try {
-
-                mediaPlayer.setDataSource(params[0]);
-
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        intialStage = true;
-                        playPause=false;
-                        playPauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                        mediaPlayer.stop();
-                        mediaPlayer.reset();
-                    }
-                });
-                mediaPlayer.prepare();
-                prepared = true;
-            } catch (IllegalArgumentException | SecurityException | IllegalStateException | IOException e) {
-                prepared = false;
-                e.printStackTrace();
-            }
-            return prepared;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            if (progress.isShowing()) {
-                progress.cancel();
-            }
-            seekBar.setMax(mediaPlayer.getDuration()/1000);
-            mediaPlayer.start();
-
-            intialStage = false;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            this.progress.setMessage(getString(R.string.progress_buffering));
-            this.progress.show();
-        }
+        mediaPlayerService.offset(episode, 5);
     }
 }

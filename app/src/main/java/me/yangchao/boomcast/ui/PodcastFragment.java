@@ -32,11 +32,13 @@ import me.yangchao.boomcast.util.StringUtil;
 public class PodcastFragment extends Fragment {
 
     private static final String ARG_PODCAST_ID = "podcastId";
+    private static final String ARG_QUERY = "query";
 
-    public static PodcastFragment newInstance(Long podcastId) {
+    public static PodcastFragment newInstance(Long podcastId, String query) {
         PodcastFragment fragment = new PodcastFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_PODCAST_ID, podcastId);
+        args.putString(ARG_QUERY, query);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,6 +57,8 @@ public class PodcastFragment extends Fragment {
 
     // others
     LayoutInflater inflater;
+    Long podcastId;
+    String query;
 
     public PodcastFragment() {
         // Required empty public constructor
@@ -65,11 +69,14 @@ public class PodcastFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        Long podcastId = args.getLong(ARG_PODCAST_ID);
+        podcastId = args.getLong(ARG_PODCAST_ID);
+        query = args.getString(ARG_QUERY);
 
         podcast = Podcast.findById(Podcast.class, podcastId);
 
-        getActivity().setTitle(podcast.getTitle());
+        String title = podcast.getTitle();
+        if(query != null) title = String.format("Search \"%s\" in %s", query, title);
+        getActivity().setTitle(title);
     }
 
 
@@ -96,7 +103,12 @@ public class PodcastFragment extends Fragment {
     }
 
     public void refresh() {
-        episodes = podcast.getEpisodes();
+        if(query == null) {
+            episodes = podcast.getEpisodes();
+        } else {
+            episodes = Episode.find(Episode.class, "podcast_id = ? and (title like ? or description like ?)",
+                    String.valueOf(podcastId), "%"+query+"%", "%"+query+"%");
+        }
         if(episodesRecyclerView != null) {
             episodesRecyclerView.getAdapter().notifyDataSetChanged();
         }

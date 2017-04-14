@@ -14,7 +14,8 @@ This App is used to manage subscriptions of Podcast.
 - Refresh podcast subscription to fetch latest episodes
 - Add new podcast subscription by URL
 - Stream podcast playback
-- Usage statistics about user listening
+- Usage statistics about daily listening time
+- Search episodes in a podcast
 - Share amazing episodes to other Apps
 
 ### Technical points
@@ -25,6 +26,7 @@ This App is used to manage subscriptions of Podcast.
 * Networking: integrating Volley, OkHttp3 and Gson. Analysing RSS XML and iTunes format
 * Sharing: Share text data to other Apps
 * Data processing: Recording user listening time and presenting some charts
+* Searching: Supporting searching within a podcast
 * 3rd party libraries: Volley, OkHttp, Sugar ORM, RxJava, Gson, Glide, Textdrawable, MarkdownView
 
 #### Test environment
@@ -41,7 +43,6 @@ This App is used to manage subscriptions of Podcast.
 ### TODO
 
 - Support episode downloading and offline playback
-- Background playing cross multiple Activities
 - Automatic refresh strategy
 
 ### Screen snapshot
