@@ -54,6 +54,8 @@ public class PodcastNewFragment extends Fragment {
     }
 
     public void subscribe(String feedUrl) {
+        if(feedUrl == null || feedUrl.isEmpty()) return;
+
         // hide keyboard
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
