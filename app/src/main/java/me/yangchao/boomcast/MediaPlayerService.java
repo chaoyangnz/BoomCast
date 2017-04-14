@@ -5,15 +5,17 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 import io.reactivex.subjects.PublishSubject;
 import me.yangchao.boomcast.model.Episode;
 import me.yangchao.boomcast.model.ListenLog;
 import me.yangchao.boomcast.util.DateUtil;
+
+import static me.yangchao.boomcast.App.LOG_TAG;
 
 /**
  * Created by richard on 4/13/17.
@@ -27,7 +29,7 @@ public class MediaPlayerService {
     public PublishSubject<Integer> audioPrepared = PublishSubject.create();
     public PublishSubject<Boolean> audioCompleted = PublishSubject.create();
 
-    public long startTime;
+    public long startTime = -1;
 
     public MediaPlayerService() {
         mediaPlayer = new MediaPlayer();
@@ -50,7 +52,7 @@ public class MediaPlayerService {
         mediaPlayer.reset();
         intialStage = true;
 
-        computeListenDuration();
+        updateListenDuration();
     }
 
     public boolean checkOwned(Episode episode) {
@@ -77,25 +79,26 @@ public class MediaPlayerService {
         return true;
     }
 
-    private void computeListenDuration() {
+    private void updateListenDuration() {
+        if(startTime < 0) return;
         if(episode == null) return;;
 
         Date now = new Date();
         String date = DateUtil.formatDate(now);
         long duration = now.getTime() - startTime;
-        List<ListenLog> listenLogs = ListenLog.find(ListenLog.class, "episode_id = ? and date = ?",
-                String.valueOf(episode.getId()), date);
-        ListenLog listenLog;
-        if(listenLogs.isEmpty()) {
+        Log.d(LOG_TAG, "Duration: " + duration/(1000*60) + " minutes (" + duration/1000 + " seconds)");
+
+        ListenLog listenLog = ListenLog.findByDateAndEpisode(date, episode.getId());
+        if(listenLog == null) {
             listenLog = new ListenLog();
             listenLog.setEpisodeId(episode.getId());
             listenLog.setDate(date);
             listenLog.setDuration(duration);
         } else {
-            listenLog = listenLogs.get(0);
             listenLog.setDuration(listenLog.getDuration() + duration);
         }
         listenLog.save();
+        startTime = -1;
     }
 
     public boolean pause(Episode episode) {
@@ -104,7 +107,7 @@ public class MediaPlayerService {
         if (mediaPlayer.isPlaying())
             mediaPlayer.pause();
 
-        computeListenDuration();
+        updateListenDuration();
         return true;
     }
 

@@ -17,6 +17,8 @@ import me.yangchao.boomcast.net.OkHttp3Stack;
 
 public class App extends Application {
 
+    public static final String LOG_TAG = "BoomCast";
+
     private static App APP;
     private RequestQueue mRequestQueue;
     public MediaPlayerService mediaPlayerService;

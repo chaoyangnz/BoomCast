@@ -19,7 +19,6 @@ import com.rometools.rome.io.XmlReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 import me.yangchao.boomcast.App;
 import me.yangchao.boomcast.model.Episode;
@@ -77,9 +76,9 @@ public class PodcastFeedRequest extends Request<Podcast> {
 
             Podcast podcast = Podcast.fromSyncFeed(feed);
             podcast.setFeedUrl(getUrl());
-            List<Podcast> existingPodcasts = Podcast.find(Podcast.class, "feed_url = ?", getUrl());
-            if(!existingPodcasts.isEmpty()) {
-                podcast.setId(existingPodcasts.get(0).getId());
+            Podcast existingPodcast = Podcast.findByFeedUrl(getUrl());
+            if(existingPodcast != null) {
+                podcast.setId(existingPodcast.getId());
             }
             podcast.save();
 
@@ -87,9 +86,9 @@ public class PodcastFeedRequest extends Request<Podcast> {
                 Episode episode = Episode.fromSyndEntry(entry);
                 episode.setPodcastId(podcast.getId());
 
-                List<Episode> existingEpisodes = Episode.find(Episode.class, "podcast_id = ? and link = ?", String.valueOf(podcast.getId()), entry.getLink());
-                if(!existingEpisodes.isEmpty()) {
-                    episode.setId(existingEpisodes.get(0).getId());
+                Episode existingEpisode = Episode.findByPodcastAndLink(podcast.getId(), entry.getLink());
+                if(existingEpisode != null) {
+                    episode.setId(existingEpisode.getId());
                 }
 
                 episode.save();

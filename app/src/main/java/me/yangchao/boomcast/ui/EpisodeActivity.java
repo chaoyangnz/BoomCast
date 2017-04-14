@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
+import me.yangchao.boomcast.model.Podcast;
 
 public class EpisodeActivity extends BaseActivity {
 
@@ -48,11 +49,12 @@ public class EpisodeActivity extends BaseActivity {
             // save notes
             case R.id.action_share:
                 // share content
-                Episode episode = Episode.findById(Episode.class, episodeId);
+                Episode episode = Episode.findById(episodeId);
+                Podcast podcast = Podcast.findById(episode.getPodcastId());
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 String sharingContent = String.format(getString(R.string.share_episode_template),
-                        episode.getPodcast().getTitle(), episode.getTitle(), episode.getEnclosureUrl());
+                        podcast.getTitle(), episode.getTitle(), episode.getEnclosureUrl());
                 sendIntent.putExtra(Intent.EXTRA_TEXT, sharingContent);
                 sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.share_episode_title)));

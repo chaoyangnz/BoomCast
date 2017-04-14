@@ -26,10 +26,6 @@ public class Podcast extends SugarRecord {
 
     private Date refreshedDate;
 
-    public List<Episode> getEpisodes() {
-        return Episode.find(Episode.class, "podcast_id = ? order by published_date desc", String.valueOf(getId()));
-    }
-
     public String getFeedUrl() {
         return feedUrl;
     }
@@ -132,5 +128,15 @@ public class Podcast extends SugarRecord {
         podcast.setRefreshedDate(new Date());
 
         return podcast;
+    }
+
+    public static Podcast findById(Long id) {
+        return Podcast.findById(Podcast.class, id);
+    }
+
+    public static Podcast findByFeedUrl(String feedUrl) {
+        List<Podcast> existingPodcasts = Podcast.find(Podcast.class, "feed_url = ? limit 1", feedUrl);
+        if(existingPodcasts.isEmpty()) return null;
+        return existingPodcasts.get(0);
     }
 }

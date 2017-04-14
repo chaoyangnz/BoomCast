@@ -6,7 +6,7 @@ android {
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId 'me.yangchao.boomcast'
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -17,8 +17,6 @@ android {
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
-//        renderscriptTargetApi 25
-//        renderscriptSupportModeEnabled true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -39,9 +37,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     //    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
-
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'

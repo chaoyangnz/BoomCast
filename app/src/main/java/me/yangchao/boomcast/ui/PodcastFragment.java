@@ -72,7 +72,7 @@ public class PodcastFragment extends Fragment {
         podcastId = args.getLong(ARG_PODCAST_ID);
         query = args.getString(ARG_QUERY);
 
-        podcast = Podcast.findById(Podcast.class, podcastId);
+        podcast = Podcast.findById(podcastId);
 
         String title = podcast.getTitle();
         if(query != null) title = String.format("Search \"%s\" in %s", query, title);
@@ -103,12 +103,8 @@ public class PodcastFragment extends Fragment {
     }
 
     public void refresh() {
-        if(query == null) {
-            episodes = podcast.getEpisodes();
-        } else {
-            episodes = Episode.find(Episode.class, "podcast_id = ? and (title like ? or description like ?)",
-                    String.valueOf(podcastId), "%"+query+"%", "%"+query+"%");
-        }
+        episodes = Episode.findByPocastAndKeyword(podcastId, query);
+
         if(episodesRecyclerView != null) {
             episodesRecyclerView.getAdapter().notifyDataSetChanged();
         }

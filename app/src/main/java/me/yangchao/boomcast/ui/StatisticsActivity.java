@@ -48,42 +48,35 @@ public class StatisticsActivity extends BaseActivity {
         addToolbar();
         setTitle("Daily Report");
 
-        String today = DateUtil.formatDate(new Date());
-
-        List<ListenPerDay> listensToday = SugarRecord.findWithQuery(ListenPerDay.class,
-                "select DATE, sum(duration) as DURATION, 0 as ID from listen_log where DATE = ? group by date ", today);
-        long total = listensToday.isEmpty() ? 0L : listensToday.get(0).getDuration();
-
         TextDrawable drawable = TextDrawable.builder()
                 .beginConfig()
                 .fontSize(80) /* size in px */
-                .endConfig().buildRound(DateUtil.formatDuration(total), R.color.colorAccent);
+                .endConfig().buildRound(DateUtil.formatDuration(getTodayListenTime()), R.color.colorAccent);
         totalListenTime.setImageDrawable(drawable);
 
-        List<ListenPerDay> listensByDate = SugarRecord.findWithQuery(ListenPerDay.class,
-                "select DATE, sum(duration) as DURATION, 0 as ID from listen_log group by date limit 15");
+        List<ListenPerDay> listensByDate = getListenTimeByDate();
 
-        Map<String, Long> map = new HashMap();
+        Map<String, Long> dateDurationMap = new HashMap();
         for(ListenPerDay listenPerDay : listensByDate) {
-            map.put(listenPerDay.date, listenPerDay.duration);
+            dateDurationMap.put(listenPerDay.date, listenPerDay.duration);
         }
-        List<String> fifteenDaysEarlier = fifteenDaysEarlier();
+        List<String> fifteenDaysEarlier = lastFifteenDays();
 
         List<Entry> entries = new ArrayList<>();
         Map<Integer, String> labels = new HashMap<>();
         for(int i = 0; i < fifteenDaysEarlier.size(); ++i) {
             String date = fifteenDaysEarlier.get(i);
-            Long duration = map.get(date);
+            Long duration = dateDurationMap.get(date);
             if(duration == null) duration = 0L;
             entries.add(new Entry(i, duration/(1000*60f)));
             labels.put(i, date.substring(5));
         }
 
-        LineDataSet dataset = new LineDataSet(entries, "Time per day");
+        LineDataSet dataset = new LineDataSet(entries, "Time per day (minutes)");
         dataset.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
 
         LineData data = new LineData(dataset);
-
+        // set X axis
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setAxisMaximum(14f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -94,8 +87,10 @@ public class StatisticsActivity extends BaseActivity {
             return label != null ? label : "";
         });
 
+        // set Y axis
         YAxis yAxisRight = lineChart.getAxisRight();
         YAxis yAxisLeft = lineChart.getAxisLeft();
+        // set legend
         Legend legend = lineChart.getLegend();
         xAxis.setTextColor(Color.WHITE);
         yAxisLeft.setTextColor(Color.WHITE);
@@ -108,7 +103,11 @@ public class StatisticsActivity extends BaseActivity {
         lineChart.getDescription().setText("");
 
         lineChart.setData(data); // set the data and
-        lineChart.invalidate();
+    }
+
+    public List<ListenPerDay> getListenTimeByDate() {
+        return SugarRecord.findWithQuery(ListenPerDay.class,
+                "select DATE, sum(duration) as DURATION, 0 as ID from listen_log group by date limit 15");
     }
 
     public static class ListenPerDay {
@@ -132,7 +131,14 @@ public class StatisticsActivity extends BaseActivity {
         }
     }
 
-    private static List<String> fifteenDaysEarlier() {
+    private long getTodayListenTime() {
+        String today = DateUtil.formatDate(new Date());
+        List<ListenPerDay> listensToday = SugarRecord.findWithQuery(ListenPerDay.class,
+                "select DATE, sum(duration) as DURATION, 0 as ID from listen_log where DATE = ? group by date ", today);
+        return listensToday.isEmpty() ? 0L : listensToday.get(0).getDuration();
+    }
+
+    private static List<String> lastFifteenDays() {
         Date today = new Date();
         Calendar cal = new GregorianCalendar();
         cal.setTime(today);

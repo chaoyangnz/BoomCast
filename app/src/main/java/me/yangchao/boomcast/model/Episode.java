@@ -5,6 +5,7 @@ import com.rometools.modules.itunes.EntryInformation;
 import com.rometools.rome.feed.synd.SyndEntry;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by richard on 4/10/17.
@@ -21,10 +22,6 @@ public class Episode extends SugarRecord {
     private String itunesSummary;
     private Long itunesDuration;
     private String itunesAuthor;
-
-    public Podcast getPodcast() {
-        return Podcast.findById(Podcast.class, podcastId);
-    }
 
     public Long getPodcastId() {
         return podcastId;
@@ -112,5 +109,26 @@ public class Episode extends SugarRecord {
         episode.setItunesDuration(entryInfo.getDuration().getMilliseconds());
 
         return episode;
+    }
+
+    public static Episode findById(Long id) {
+        return Episode.findById(Episode.class, id);
+    }
+
+    public static Episode findByPodcastAndLink(Long podcastId, String link) {
+        List<Episode> existingEpisodes = Episode.find(Episode.class, "podcast_id = ? and link = ? limit 1",
+                String.valueOf(podcastId), link);
+        if(existingEpisodes.isEmpty()) return null;
+        return existingEpisodes.get(0);
+    }
+
+    public static List<Episode> findByPodcast(Long podcastId) {
+        return Episode.find(Episode.class, "podcast_id = ? order by published_date desc", String.valueOf(podcastId));
+    }
+
+    public static List<Episode> findByPocastAndKeyword(Long podcastId, String query) {
+        if(query == null) return findByPodcast(podcastId);
+        return Episode.find(Episode.class, "podcast_id = ? and (title like ? or description like ?) order by published_date desc",
+                String.valueOf(podcastId), "%"+query+"%", "%"+query+"%");
     }
 }

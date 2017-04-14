@@ -12,8 +12,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -27,8 +25,10 @@ import me.yangchao.boomcast.net.PodcastFeedRequest;
  */
 public class PodcastNewFragment extends Fragment {
 
+    private static final String ARG_FEED_URL = "feedUrl";
     // UI widgets
-    @BindView(R.id.podcast_feed_url) EditText podcastFeedUrl;
+    @BindView(R.id.podcast_feed_url)
+    EditText podcastFeedUrl;
 
     // event subject
     public PublishSubject<Podcast> subscriptionSaved = PublishSubject.create();
@@ -37,12 +37,25 @@ public class PodcastNewFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static PodcastNewFragment newInstance(String feedUrl) {
+        PodcastNewFragment fragment = new PodcastNewFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_FEED_URL, feedUrl);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_podcast_new, container, false);
         ButterKnife.bind(this, view);
+
+        Bundle args = getArguments();
+        String feedUrl = args.getString(ARG_FEED_URL);
+        if(feedUrl != null) podcastFeedUrl.setText(feedUrl);
+
         return view;
     }
 
@@ -62,8 +75,8 @@ public class PodcastNewFragment extends Fragment {
                 InputMethodManager.HIDE_NOT_ALWAYS);
 
         // query
-        List<Podcast> list = Podcast.find(Podcast.class, "feed_url = ?", feedUrl);
-        if(list.isEmpty()) {
+        Podcast existingPodcast = Podcast.findByFeedUrl(feedUrl);
+        if(existingPodcast == null) {
             PodcastFeedRequest.requstFeedSource(getContext(), feedUrl,
                     podcast -> {
                         subscriptionSaved.onNext(podcast);

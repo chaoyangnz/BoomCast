@@ -31,7 +31,7 @@ This App is used to manage subscriptions of Podcast.
 
 #### Test environment
 
-- SDK API 25
+- SDK API 25, minimum SDK 23
 - Tested on Google Nexus 5X
 
 ### Notice
@@ -44,6 +44,8 @@ This App is used to manage subscriptions of Podcast.
 
 - Support episode downloading and offline playback
 - Automatic refresh strategy
+- Network exception handling, especially when offline or network is not stable
+- Better adapt Tablet or landscape orientation
 
 ### Screen snapshot
 

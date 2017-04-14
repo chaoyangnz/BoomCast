@@ -77,12 +77,19 @@ public class EpisodeFragment extends Fragment {
         Bundle args = getArguments();
         Long episodeId = args.getLong(ARG_EPISODE_ID);
 
-        episode = Episode.findById(Episode.class, episodeId);
-        podcast = episode.getPodcast();
+        episode = Episode.findById(episodeId);
+        podcast = Podcast.findById(episode.getPodcastId());
 
         getActivity().setTitle(episode.getTitle());
 
         mediaPlayerService = App.getInstance().mediaPlayerService;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
+        handler = null;
     }
 
     @Override

@@ -41,6 +41,12 @@ public abstract class BaseActivity extends AppCompatActivity {
             fragmentManager.beginTransaction()
                     .add(containerViewId, fragment)
                     .commit();
+        } else {
+            fragment = fragmentFactory.newInstance();
+
+            fragmentManager.beginTransaction()
+                    .replace(containerViewId, fragment)
+                    .commit();
         }
 
         return (T) fragment;

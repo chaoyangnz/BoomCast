@@ -83,7 +83,7 @@ public class PodcastActivity extends BaseActivity {
             // save notes
             case R.id.action_refresh:
                 // refresh episode
-                Podcast p = Podcast.findById(Podcast.class, podcastId);
+                Podcast p = Podcast.findById(podcastId);
                 PodcastFeedRequest.requstFeedSource(this, p.getFeedUrl(),
                         podcast -> {
                             // SnackBar to display successful message
