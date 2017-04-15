@@ -67,7 +67,10 @@ public class MainActivity extends BaseActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_fab);
         fab.setOnClickListener(v -> {
             if(twoPanel) {
-                addFragment(PodcastNewFragment.newInstance(null), R.id.right_fragment);
+                PodcastNewFragment podcastNewFragment = addFragment(PodcastNewFragment.newInstance(null), R.id.right_fragment);
+                podcastNewFragment.subscriptionSaved.subscribe(podcast -> {
+                   subscriptionAdded();
+                });
             } else {
                 PodcastNewActivity.startActivity(this, REQUEST_NEW_PODCAST);
             }
@@ -90,12 +93,16 @@ public class MainActivity extends BaseActivity {
         if (requestCode == REQUEST_NEW_PODCAST) {
             // Handle result
             if(resultCode == RESULT_OK) {
-                Snackbar.make(findViewById(R.id.podcasts_fragment), R.string.info_podcast_subscribed, Snackbar.LENGTH_LONG)
-                        .show();
-
-                podcastsFragment.refresh();
+                subscriptionAdded();
             }
         }
+    }
+
+    private void subscriptionAdded() {
+        Snackbar.make(findViewById(R.id.podcasts_fragment), R.string.info_podcast_subscribed, Snackbar.LENGTH_LONG)
+                .show();
+
+        podcastsFragment.refresh();
     }
 
     @Override
