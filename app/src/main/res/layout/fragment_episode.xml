@@ -63,6 +63,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:background="@color/playerLightDark"
+                android:scrollbars="vertical"
                 android:padding="@dimen/normal_margin"/>
 
             <SeekBar

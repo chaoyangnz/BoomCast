@@ -28,7 +28,7 @@ public class PodcastNewActivity extends BaseActivity {
 
         String feedUrl = handleSharedFeedUrl();
 
-        PodcastNewFragment podcastNewFragment = addFragment(() -> PodcastNewFragment.newInstance(feedUrl), R.id.podcast_new_fragment);
+        PodcastNewFragment podcastNewFragment = addFragment(PodcastNewFragment.newInstance(feedUrl), R.id.podcast_new_fragment);
         podcastNewFragment.subscriptionSaved.subscribe(podcast -> {
             setResult(RESULT_OK);
             finish();

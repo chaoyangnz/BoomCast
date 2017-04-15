@@ -45,19 +45,19 @@ public class MainActivity extends BaseActivity {
 
         View view = findViewById(R.id.right_fragment);
         twoPanel = view != null;
-        podcastsFragment = addFragment(PodcastsFragment::new, R.id.podcasts_fragment);
+        podcastsFragment = addFragment(new PodcastsFragment(), R.id.podcasts_fragment);
         if(twoPanel) { // two panel
             podcastsFragment.podcastClicked.subscribe(podcastId -> {
-                PodcastFragment podcastFragment = addFragment(() ->
-                        PodcastFragment.newInstance(podcastId),
+                PodcastFragment podcastFragment = addFragment(PodcastFragment.newInstance(podcastId),
                         R.id.right_fragment);
                 podcastFragment.episodeClicked.subscribe(episodeId -> {
-                    EpisodeFragment episodeFragment = addFragment(() ->
-                                    EpisodeFragment.newInstance(episodeId),
+                    EpisodeFragment episodeFragment = addFragment(EpisodeFragment.newInstance(episodeId),
                             R.id.right_fragment);
                 });
             });
         } else {
+            // MUST remove, since Android retains fragments when rotate screen
+            removeFragment(R.id.right_fragment);
             podcastsFragment.podcastClicked.subscribe(podcastId -> {
                 PodcastActivity.startActivity(this, podcastId);
             });
@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_fab);
         fab.setOnClickListener(v -> {
             if(twoPanel) {
-                addFragment(() -> PodcastNewFragment.newInstance(null), R.id.right_fragment);
+                addFragment(PodcastNewFragment.newInstance(null), R.id.right_fragment);
             } else {
                 PodcastNewActivity.startActivity(this, REQUEST_NEW_PODCAST);
             }
@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity {
                 Episode episode = App.getInstance().mediaPlayerService.episode;
                 if(episode != null) {
                     if(twoPanel) {
-                        addFragment(() -> EpisodeFragment.newInstance(episode.getId()), R.id.right_fragment);
+                        addFragment(EpisodeFragment.newInstance(episode.getId()), R.id.right_fragment);
                     } else {
                         EpisodeActivity.startActivity(this, episode.getId());
                     }

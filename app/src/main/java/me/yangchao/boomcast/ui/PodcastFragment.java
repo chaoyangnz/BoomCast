@@ -7,10 +7,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +38,7 @@ import me.yangchao.boomcast.util.DateUtil;
 import me.yangchao.boomcast.util.StringUtil;
 
 import static android.content.Context.SEARCH_SERVICE;
+import static me.yangchao.boomcast.App.LOG_TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -101,6 +103,7 @@ public class PodcastFragment extends Fragment {
                 .into(podcastImage);
 
         podcastDescription.setText(podcast.getDescription());
+        podcastDescription.setMovementMethod(new ScrollingMovementMethod());
 
         episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter());
         episodesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -114,11 +117,13 @@ public class PodcastFragment extends Fragment {
         // don't show option menu when searching
         inflater.inflate(R.menu.podcast_menu, menu);
         // search action
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint(getString(R.string.episodes_search_hint));
         // fix full screen in landscape
         int options = searchView.getImeOptions();
         searchView.setImeOptions(options| EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        searchView.setMaxWidth(Integer.MAX_VALUE); // when searching, use the whole space
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -126,7 +131,11 @@ public class PodcastFragment extends Fragment {
                 return true;
             }
             @Override
-            public boolean onQueryTextChange(String newText) { return false;}
+            public boolean onQueryTextChange(String newText) {
+                Log.d(LOG_TAG, String.valueOf(searchView.getWidth()));
+                Log.d(LOG_TAG, String.valueOf(searchView.getMaxWidth()));
+                return false;
+            }
         });
 
         searchView.setOnCloseListener(() -> {

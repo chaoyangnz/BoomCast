@@ -31,7 +31,7 @@ public class PodcastActivity extends BaseActivity {
         Intent intent = getIntent();
         podcastId = intent.getLongExtra(INTENT_PODCAST_ID, 1);
 
-        podcastFragment = addFragment(() -> PodcastFragment.newInstance(podcastId), R.id.podcast_fragment);
+        podcastFragment = addFragment(PodcastFragment.newInstance(podcastId), R.id.podcast_fragment);
         podcastFragment.episodeClicked.subscribe(episodeId -> {
            EpisodeActivity.startActivity(this, episodeId);
         });

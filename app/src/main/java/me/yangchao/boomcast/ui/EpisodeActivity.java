@@ -27,6 +27,6 @@ public class EpisodeActivity extends BaseActivity {
 
         Intent intent = getIntent();
         episodeId = intent.getLongExtra(INTENT_EPISODE_ID, 1);
-        addFragment(() -> EpisodeFragment.newInstance(episodeId), R.id.episode_player_fragment);
+        addFragment(EpisodeFragment.newInstance(episodeId), R.id.episode_player_fragment);
     }
 }
