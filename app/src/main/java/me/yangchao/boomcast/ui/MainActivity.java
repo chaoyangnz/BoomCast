@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity {
         if(twoPanel) { // two panel
             podcastsFragment.podcastClicked.subscribe(podcastId -> {
                 PodcastFragment podcastFragment = addFragment(() ->
-                        PodcastFragment.newInstance(podcastId, null),
+                        PodcastFragment.newInstance(podcastId),
                         R.id.right_fragment);
                 podcastFragment.episodeClicked.subscribe(episodeId -> {
                     EpisodeFragment episodeFragment = addFragment(() ->
@@ -104,7 +104,7 @@ public class MainActivity extends BaseActivity {
             case android.R.id.home:
                 DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawerLayout.openDrawer(GravityCompat.START);
-                break;
+                return true;
             case R.id.action_player:
                 // refresh episode
                 Episode episode = App.getInstance().mediaPlayerService.episode;
@@ -120,11 +120,10 @@ public class MainActivity extends BaseActivity {
                             Snackbar.LENGTH_SHORT)
                             .show();
                 }
-
                 return true;
             default:
+                return super.onOptionsItemSelected(item);
         }
-        return true;
     }
 
     @Override

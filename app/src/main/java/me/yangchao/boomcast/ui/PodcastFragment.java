@@ -1,14 +1,23 @@
 package me.yangchao.boomcast.ui;
 
 
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,8 +32,11 @@ import io.reactivex.subjects.PublishSubject;
 import me.yangchao.boomcast.R;
 import me.yangchao.boomcast.model.Episode;
 import me.yangchao.boomcast.model.Podcast;
+import me.yangchao.boomcast.net.PodcastFeedRequest;
 import me.yangchao.boomcast.util.DateUtil;
 import me.yangchao.boomcast.util.StringUtil;
+
+import static android.content.Context.SEARCH_SERVICE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,13 +44,11 @@ import me.yangchao.boomcast.util.StringUtil;
 public class PodcastFragment extends Fragment {
 
     private static final String ARG_PODCAST_ID = "podcastId";
-    private static final String ARG_QUERY = "query";
 
-    public static PodcastFragment newInstance(Long podcastId, String query) {
+    public static PodcastFragment newInstance(Long podcastId) {
         PodcastFragment fragment = new PodcastFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_PODCAST_ID, podcastId);
-        args.putString(ARG_QUERY, query);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,7 +68,6 @@ public class PodcastFragment extends Fragment {
     // others
     LayoutInflater inflater;
     Long podcastId;
-    String query;
 
     public PodcastFragment() {
         // Required empty public constructor
@@ -68,17 +77,15 @@ public class PodcastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         Bundle args = getArguments();
         podcastId = args.getLong(ARG_PODCAST_ID);
-        query = args.getString(ARG_QUERY);
 
         podcast = Podcast.findById(podcastId);
 
-        String title = podcast.getTitle();
-        if(query != null) title = String.format("Search \"%s\" in %s", query, title);
-        getActivity().setTitle(title);
+        getActivity().setTitle(podcast.getTitle());
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,7 +95,7 @@ public class PodcastFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_podcast, container, false);
         ButterKnife.bind(this, view);
 
-        Glide.with(container.getContext())
+        Glide.with(getContext())
                 .load(Uri.parse(podcast.getImageUrl()))
 //                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .into(podcastImage);
@@ -97,12 +104,64 @@ public class PodcastFragment extends Fragment {
 
         episodesRecyclerView.setAdapter(new EpisodesRecyclerAdapter());
         episodesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        refresh();
+        refresh(null);
 
         return view;
     }
 
-    public void refresh() {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // don't show option menu when searching
+        inflater.inflate(R.menu.podcast_menu, menu);
+        // search action
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView.setQueryHint(getString(R.string.episodes_search_hint));
+        // fix full screen in landscape
+        int options = searchView.getImeOptions();
+        searchView.setImeOptions(options| EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                refresh(query);
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) { return false;}
+        });
+
+        searchView.setOnCloseListener(() -> {
+            refresh(null);
+            return false;
+        });
+
+        // don't use system intent-based search manager.
+        SearchManager searchManager = (SearchManager) getContext().getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getContext(), PodcastActivity.class)));
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // save notes
+            case R.id.action_refresh:
+                // refresh episode
+                PodcastFeedRequest.requstFeedSource(getContext(), podcast.getFeedUrl(),
+                        refreshedPodcast -> {
+                            // SnackBar to display successful message
+                            Snackbar.make(getView(), R.string.info_episodes_refreshed,
+                                    Snackbar.LENGTH_SHORT)
+                                    .show();
+                            refresh(null);
+                        }, error -> {});
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void refresh(String query) {
         episodes = Episode.findByPocastAndKeyword(podcastId, query);
 
         if(episodesRecyclerView != null) {

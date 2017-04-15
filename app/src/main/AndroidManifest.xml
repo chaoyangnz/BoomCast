@@ -39,17 +39,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.PodcastActivity" android:windowSoftInputMode="adjustPan">
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
+        <activity android:name=".ui.PodcastActivity" android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".ui.EpisodeActivity" />
         <activity android:name=".ui.HelpActivity" />
         <activity android:name=".ui.StatisticsActivity"></activity>

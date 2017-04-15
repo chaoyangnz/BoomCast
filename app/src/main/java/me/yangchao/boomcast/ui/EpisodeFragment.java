@@ -1,11 +1,15 @@
 package me.yangchao.boomcast.ui;
 
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -73,6 +77,8 @@ public class EpisodeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         Bundle args = getArguments();
         Long episodeId = args.getLong(ARG_EPISODE_ID);
@@ -171,6 +177,32 @@ public class EpisodeFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.episode_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // save notes
+            case R.id.action_share:
+                // share content
+                Podcast podcast = Podcast.findById(episode.getPodcastId());
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                String sharingContent = String.format(getString(R.string.share_episode_template),
+                        podcast.getTitle(), episode.getTitle(), episode.getEnclosureUrl());
+                sendIntent.putExtra(Intent.EXTRA_TEXT, sharingContent);
+                sendIntent.setType("text/plain");
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.share_episode_title)));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @OnClick(R.id.play_pause_button)

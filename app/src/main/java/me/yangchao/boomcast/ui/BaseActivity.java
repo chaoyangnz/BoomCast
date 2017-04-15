@@ -35,17 +35,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         Fragment fragment = fragmentManager.findFragmentById(containerViewId);
 
         if (fragment == null) {
-
             fragment = fragmentFactory.newInstance();
 
             fragmentManager.beginTransaction()
                     .add(containerViewId, fragment)
+                    .addToBackStack(null)
                     .commit();
         } else {
             fragment = fragmentFactory.newInstance();
 
             fragmentManager.beginTransaction()
                     .replace(containerViewId, fragment)
+                    .addToBackStack(null)
                     .commit();
         }
 

@@ -5,7 +5,7 @@
     <dimen name="seekbar_height">20dp</dimen>
     <dimen name="normal_margin">16dp</dimen>
     <dimen name="small_margin">10dp</dimen>
-    <dimen name="player_button_size">50dp</dimen>
+    <dimen name="player_button_size">40dp</dimen>
     <dimen name="player_button_marin">30dp</dimen>
     <dimen name="micro_margin">5dp</dimen>
 </resources>

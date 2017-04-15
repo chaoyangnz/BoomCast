@@ -11,4 +11,5 @@
     <string name="help_page_title">Help</string>
     <string name="warn_no_episode_playing">No episode playing</string>
     <string name="search_hint">Search episodes ..</string>
+    <string name="episodes_search_hint">Search episodes..</string>
 </resources>

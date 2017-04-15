@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_player"
         android:icon="@drawable/ic_audiotrack_white_24dp"
-        android:title="Refresh"
+        android:title="Player"
+        android:orderInCategory="9999"
         app:showAsAction="always"/>
 </menu>
