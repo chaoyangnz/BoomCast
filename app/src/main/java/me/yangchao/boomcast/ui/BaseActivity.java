@@ -3,6 +3,7 @@ package me.yangchao.boomcast.ui;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,20 +23,22 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected <T extends Fragment> T addFragment(Fragment newFragment, @IdRes int containerViewId) {
+        return addFragment(newFragment, containerViewId, false);
+    }
+
+    protected <T extends Fragment> T addFragment(Fragment newFragment, @IdRes int containerViewId, boolean pushToStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(containerViewId);
 
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (fragment == null) {
-            fragmentManager.beginTransaction()
-                    .add(containerViewId, newFragment)
-                    .addToBackStack(null)
-                    .commit();
+            transaction.add(containerViewId, newFragment);
         } else {
-            fragmentManager.beginTransaction()
-                    .replace(containerViewId, newFragment)
-                    .addToBackStack(null)
-                    .commit();
+            transaction.replace(containerViewId, newFragment);
         }
+        if(pushToStack) transaction.addToBackStack(null);
+
+        transaction.commit();
 
         return (T) newFragment;
     }

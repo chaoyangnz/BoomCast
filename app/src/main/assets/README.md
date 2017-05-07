@@ -49,14 +49,14 @@ This App is used to manage subscriptions of Podcast.
 
 ### Screen snapshot
 
-<img src="snapshot1.png" width="200" />
-<img src="snapshot2.jpeg" width="200" />
-<img src="snapshot3.jpeg" width="200" />
-<img src="snapshot4.jpeg" width="200" />
-<img src="snapshot5.png" width="200" />
-<img src="snapshot6.png" width="200" />
-<img src="snapshot7.png" width="200" />
-<img src="snapshot8.png" width="200" />
-<img src="snapshot9.jpeg" width="200" />
-<img src="snapshot10.png" width="450" />
+<img src="snapshot1.png" width="300" />
+<img src="snapshot2.jpeg" width="300" />
+<img src="snapshot3.jpeg" width="300" />
+<img src="snapshot4.jpeg" width="300" />
+<img src="snapshot5.png" width="300" />
+<img src="snapshot6.png" width="300" />
+<img src="snapshot7.png" width="300" />
+<img src="snapshot8.png" width="300" />
+<img src="snapshot9.jpeg" width="300" />
+<img src="snapshot10.png" width="500" />
 
